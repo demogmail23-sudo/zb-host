@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZB-HOST | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f1f5f9; overflow-x: hidden; position: relative; }
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            z-index: -1; animation: pulseBg 10s infinite alternate;
+        }
+        @keyframes pulseBg { from { opacity: 0.5; transform: scale(1); } to { opacity: 1; transform: scale(1.2); } }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .premium-card { background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.9)); transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); }
+        .premium-card:hover { border-color: #8b5cf6; transform: translateY(-5px); box-shadow: 0 20px 40px -15px rgba(139, 92, 246, 0.3); }
+        .status-running { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); animation: breathe 2s infinite; }
+        @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        #mobile-drawer { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .drawer-open { transform: translateX(0) !important; }
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 12px; font-size: 11px; font-weight: 800; color: #fff; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    <div id="toast-container"></div>
+    
+    <div id="log-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-3xl glass rounded-[2.5rem] flex flex-col h-[80vh] overflow-hidden border border-white/10">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="scroll-text" class="text-indigo-400"></i>
+                    <h3 id="modal-title" class="font-black text-sm uppercase tracking-widest">Process Logs</h3>
+                </div>
+                <button onclick="closeLogs()" class="p-2 hover:bg-red-500/20 text-red-500 rounded-xl transition-all"><i data-lucide="x"></i></button>
+            </div>
+            <pre id="log-content" class="flex-1 p-6 font-mono text-[11px] text-indigo-300/80 overflow-y-auto custom-scrollbar bg-black/20 italic"></pre>
+        </div>
+    </div>
+
+    <div id="drawer-overlay" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[60] hidden"></div>
+    
+    <aside id="mobile-drawer" class="fixed inset-y-0 left-0 w-72 glass z-[70] -translate-x-full lg:translate-x-0 lg:static flex flex-col justify-between p-6 border-r border-white/5">
+        <div class="space-y-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/20"><i data-lucide="zap" class="text-white fill-white w-5 h-5"></i></div>
+                    <h2 class="text-2xl font-black italic tracking-tighter text-indigo-400">ZB-HOST</h2>
+                </div>
+                <button onclick="toggleDrawer()" class="p-2 text-slate-400 lg:hidden"><i data-lucide="x"></i></button>
+            </div>
+            <nav class="space-y-2">
+                <div class="px-4 py-3 bg-indigo-600/10 text-indigo-400 rounded-xl border border-indigo-500/20 flex items-center gap-3 font-bold text-sm cursor-pointer">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </div>
+                <div onclick="window.location.reload()" class="px-4 py-3 text-slate-400 hover:bg-white/5 rounded-xl flex items-center gap-3 font-semibold transition-all cursor-pointer">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i> Refresh
+                </div>
+            </nav>
+        </div>
+        <div class="space-y-4">
+            <div class="p-4 bg-white/5 rounded-2xl border border-white/5 text-center">
+                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Dev</p>
+                <p class="text-sm font-black text-indigo-400 italic">ZAINU BHAI</p>
+            </div>
+            <a href="/logout" class="flex items-center justify-center gap-3 px-6 py-4 bg-red-500/10 text-red-500 rounded-2xl font-black text-[10px] uppercase hover:bg-red-500 hover:text-white transition-all">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-screen overflow-y-auto custom-scrollbar p-6 lg:p-10">
+        <div class="flex justify-between items-center mb-10">
+            <button onclick="toggleDrawer()" class="p-3 bg-white/5 rounded-2xl lg:hidden"><i data-lucide="menu"></i></button>
+            <div id="time-display" class="text-xs font-black text-slate-500 font-mono italic">00:00:00</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="premium-card p-6 rounded-[2rem]">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">CPU</p>
+                <h2 id="cpu-val" class="text-4xl font-black italic">0%</h2>
+            </div>
+            <div class="premium-card p-6 rounded-[2rem]">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">RAM</p>
+                <h2 id="ram-val" class="text-4xl font-black italic">0%</h2>
+            </div>
+            <div class="premium-card p-6 rounded-[2rem]">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Nodes</p>
+                <h2 id="bot-count" class="text-4xl font-black italic">0</h2>
+            </div>
+            <div onclick="document.getElementById('fileInput').click()" class="premium-card p-6 rounded-[2rem] border-2 border-dashed border-indigo-500/20 flex flex-col items-center justify-center cursor-pointer group hover:bg-indigo-500/5">
+                <input type="file" id="fileInput" hidden onchange="handleUpload(this.files[0])">
+                <i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-400 mb-2 group-hover:scale-110 transition-transform"></i>
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">Deploy</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 mb-8">
+            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Hosted Files</h3>
+            <div class="h-px bg-white/5 flex-1"></div>
+        </div>
+        <div id="files-list" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12"></div>
+
+        <div class="flex items-center gap-4 mb-8">
+            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Active Instances</h3>
+            <div class="h-px bg-white/5 flex-1"></div>
+        </div>
+        <div id="bots-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleDrawer() {
+            document.getElementById('mobile-drawer').classList.toggle('drawer-open');
+            document.getElementById('drawer-overlay').classList.toggle('hidden');
+        }
+
+        function showToast(msg, isErr=false) {
+            const t = document.createElement('div');
+            t.className = `toast ${isErr ? 'border-red-500/50 text-red-400' : 'border-indigo-500/50 text-indigo-400'}`;
+            t.innerText = msg;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        // Clock Update
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time-display').innerText = now.toLocaleTimeString();
+        }
+
+        // CPU & RAM Update
+        async function updateStats() {
+            try {
+                const r = await fetch('/api/stats');
+                const d = await r.json();
+                document.getElementById('cpu-val').innerText = d.cpu + "%";
+                document.getElementById('ram-val').innerText = d.ram + "%";
+            } catch(e) { console.error("Stats fail"); }
+        }
+
+        async function handleUpload(file) {
+            if(!file) return;
+            showToast("UPLOADING: " + file.name.toUpperCase());
+            const fd = new FormData(); fd.append('file', file);
+            const r = await fetch('/upload', { method: 'POST', body: fd });
+            if(r.ok) { showToast("DEPLOYED SUCCESSFULLY"); loadFiles(); loadBots(); }
+        }
+
+        async function loadFiles() {
+            try {
+                const r = await fetch('/api/files');
+                const data = await r.json();
+                let html = '';
+                data.forEach(f => {
+                    const online = f.status === "Online";
+                    html += `
+                    <div class="premium-card p-4 rounded-2xl flex items-center justify-between group">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold truncate w-24">${f.name}</span>
+                            <span class="text-[8px] font-black uppercase ${online ? 'text-emerald-500' : 'text-slate-500'}">${f.status}</span>
+                        </div>
+                        <button onclick="deleteFile('${f.name}')" class="p-2 text-slate-600 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>`;
+                });
+                document.getElementById('files-list').innerHTML = html || '<p class="text-[10px] text-slate-600">No files</p>';
+                lucide.createIcons();
+            } catch(e){}
+        }
+
+        async function deleteFile(name) {
+            if(!confirm("Destroy Node: " + name + "?")) return;
+            const r = await fetch(`/api/delete_file/${encodeURIComponent(name)}`);
+            if(r.ok) { showToast("TERMINATED & DELETED"); loadFiles(); loadBots(); }
+            else { showToast("DELETE FAILED", true); }
+        }
+
+        async function loadBots() {
+            try {
+                const r = await fetch('/api/bots');
+                const bots = await r.json();
+                document.getElementById('bot-count').innerText = bots.length;
+                let html = '';
+                bots.forEach(b => {
+                    const running = b.status === "Running";
+                    html += `
+                    <div class="premium-card p-8 rounded-[2.5rem]">
+                        <div class="flex justify-between mb-8">
+                            <i data-lucide="terminal" class="text-indigo-400"></i>
+                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${running ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 status-running' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">${b.status}</span>
+                        </div>
+                        <h4 class="text-xs font-black uppercase italic mb-8 truncate">${b.name}</h4>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="action('${b.name}', 'start')" class="p-4 bg-indigo-600 rounded-2xl hover:bg-indigo-500 transition-all"><i data-lucide="play" class="w-4 h-4 fill-white"></i></button>
+                            <button onclick="action('${b.name}', 'stop')" class="p-4 bg-white/5 rounded-2xl hover:bg-white/10"><i data-lucide="square" class="w-4 h-4"></i></button>
+                            <button onclick="viewLogs('${b.name}')" class="p-4 bg-white/5 rounded-2xl hover:bg-indigo-500/20"><i data-lucide="scroll-text" class="w-4 h-4"></i></button>
+                            <button onclick="deleteFile('${b.name}')" class="p-4 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
+                });
+                document.getElementById('bots-grid').innerHTML = html;
+                lucide.createIcons();
+            } catch(e){}
+        }
+
+        async function action(name, type) {
+            showToast("COMMAND: " + type.toUpperCase());
+            await fetch(`/api/${type}/${name}`);
+            setTimeout(() => { loadBots(); loadFiles(); }, 1000);
+        }
+
+        async function viewLogs(name) {
+            document.getElementById('modal-title').innerText = "Logs: " + name;
+            document.getElementById('log-modal').classList.remove('hidden');
+            const r = await fetch(`/api/logs/${name}`);
+            document.getElementById('log-content').innerText = await r.text();
+        }
+
+        function closeLogs() { document.getElementById('log-modal').classList.add('hidden'); }
+
+        // Intervals
+        setInterval(updateTime, 1000);
+        setInterval(updateStats, 3000);
+        setInterval(loadBots, 5000);
+        
+        // Initial Load
+        updateTime();
+        updateStats();
+        loadFiles();
+        loadBots();
+    </script>
+</body>
+</html>
