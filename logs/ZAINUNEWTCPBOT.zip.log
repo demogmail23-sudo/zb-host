@@ -1,0 +1,64 @@
+Traceback (most recent call last):
+  File "/storage/emulated/0/ap/uploads/ZAINUNEWTCPBOT.zip_dir/app.py", line 317, in <module>
+    socketio.run(app)
+    ~~~~~~~~~~~~^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/flask_socketio/__init__.py", line 674, in run
+    app.run(host=host, port=port, threaded=True,
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            use_reloader=use_reloader, **reloader_options, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/flask/app.py", line 662, in run
+    run_simple(t.cast(str, host), port, self, **options)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/werkzeug/serving.py", line 1094, in run_simple
+    srv = make_server(
+        hostname,
+    ...<7 lines>...
+        fd=fd,
+    )
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/werkzeug/serving.py", line 931, in make_server
+    return ThreadedWSGIServer(
+        host, port, app, request_handler, passthrough_errors, ssl_context, fd=fd
+    )
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/werkzeug/serving.py", line 793, in __init__
+    self.socket = socket.fromfd(fd, address_family, socket.SOCK_STREAM)
+                  ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/socket.py", line 548, in fromfd
+    nfd = dup(fd)
+OSError: [Errno 9] Bad file descriptor
+Traceback (most recent call last):
+  File "/storage/emulated/0/ap/uploads/ZAINUNEWTCPBOT.zip_dir/app.py", line 317, in <module>
+    socketio.run(app)
+    ~~~~~~~~~~~~^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/flask_socketio/__init__.py", line 674, in run
+    app.run(host=host, port=port, threaded=True,
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            use_reloader=use_reloader, **reloader_options, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/flask/app.py", line 662, in run
+    run_simple(t.cast(str, host), port, self, **options)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/werkzeug/serving.py", line 1094, in run_simple
+    srv = make_server(
+        hostname,
+    ...<7 lines>...
+        fd=fd,
+    )
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/werkzeug/serving.py", line 931, in make_server
+    return ThreadedWSGIServer(
+        host, port, app, request_handler, passthrough_errors, ssl_context, fd=fd
+    )
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/site-packages/werkzeug/serving.py", line 793, in __init__
+    self.socket = socket.fromfd(fd, address_family, socket.SOCK_STREAM)
+                  ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/0/ru.iiec.pydroid3/files/aarch64-linux-android/lib/python3.13/socket.py", line 548, in fromfd
+    nfd = dup(fd)
+OSError: [Errno 9] Bad file descriptor
+ * Serving Flask app 'app'
+ * Debug mode: off
+Address already in use
+Port 5000 is in use by another program. Either identify and stop that program, or start the server with a different port.
+ * Serving Flask app 'app'
+ * Debug mode: off
+Address already in use
+Port 5000 is in use by another program. Either identify and stop that program, or start the server with a different port.
